@@ -154,12 +154,15 @@ async function sendData() {
     }
 
     try {
-        const res = await fetch(https://default07701cb9af5347039146bbc568caf4.a9.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/27bc1969e5074e17b6aa8ccef4bc91b8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=v6A6fj7mCzQ94O3fUhjzR96YgEEGE3lUM3mV08-mQ4U, {
+        const res = await fetch("https://default07701cb9af5347039146bbc568caf4.a9.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/27bc1969e5074e17b6aa8ccef4bc91b8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=v6A6fj7mCzQ94O3fUhjzR96YgEEGE3lUM3mV08-mQ4U", {
             method: "POST",
             body: formData
         });
-        status.innerText = res.ok ? "✔️ Envoyé avec succès !" : "❌ Erreur d’envoi.";
-    } catch {
+
+        status.innerText = res.ok 
+            ? "✔️ Envoyé avec succès !" 
+            : "❌ Erreur d’envoi.";
+    } catch (error) {
         status.innerText = "❌ Impossible d'envoyer.";
     }
 }
