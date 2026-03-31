@@ -19,9 +19,7 @@
         text-align: center;
     }
 
-    .header img {
-        max-height: 60px;
-    }
+    .header img { max-height: 60px; }
 
     .card {
         background: white;
@@ -58,10 +56,6 @@
         box-sizing: border-box;
     }
 
-    input:focus, textarea:focus, select:focus {
-        outline: 2px solid #4DA3FF;
-    }
-
     button {
         width: 100%;
         padding: 15px;
@@ -74,10 +68,7 @@
         cursor: pointer;
         transition: 0.2s;
     }
-
-    button:hover {
-        background: #C12937;
-    }
+    button:hover { background: #C12937; }
 
     #status {
         text-align: center;
@@ -85,16 +76,11 @@
         font-weight: bold;
         color: #005CB9;
     }
-
-    .icon {
-        margin-right: 6px;
-    }
 </style>
 </head>
 
 <body>
 
-<!-- En-tête GRG avec logo -->
 <div class="header">
     <img src="https://propanegrg.com/wp-content/uploads/2018/05/logo.png" alt="Logo GRG">
 </div>
@@ -102,16 +88,13 @@
 <div class="card">
     <h2>Collecte d'information terrain</h2>
 
-    <!-- Nom du livreur -->
-    <label><span class="icon">👤</span>Nom du livreur</label>
-    <input id="name" type="text" placeholder="Nom complet">
+    <label>Nom du livreur</label>
+    <input id="name" type="text">
 
-    <!-- No magasin -->
-    <label><span class="icon">🏪</span>No magasin</label>
-    <input id="store" type="text" placeholder="Ex: 1234">
+    <label>No magasin</label>
+    <input id="store" type="text">
 
-    <!-- Raison -->
-    <label><span class="icon">📌</span>Raison</label>
+    <label>Raison</label>
     <select id="reason">
         <option value="">-- Choisir une raison --</option>
         <option value="Neige">Neige</option>
@@ -124,45 +107,59 @@
         <option value="Autre">Autre</option>
     </select>
 
-    <!-- Description -->
-    <label><span class="icon">📝</span>Description</label>
-    <textarea id="description" rows="4" placeholder="Décris la situation..."></textarea>
+    <label>Description</label>
+    <textarea id="description" rows="4"></textarea>
 
-    <!-- Photos -->
-    <label><span class="icon">📸</span>Photos</label>
-    <input id="photos" type="file" multiple accept="image/*" capture="environment">
+    <label>Photos</label>
+    <input id="photos" type="file" multiple accept="image/*">
 
     <button onclick="sendData()">📤 Envoyer</button>
-
     <p id="status"></p>
 </div>
 
 <script>
+async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]); 
+        reader.onerror = (error) => reject(error);
+    });
+}
+
 async function sendData() {
     let status = document.getElementById("status");
     status.innerText = "Envoi en cours...";
 
-    const formData = new FormData();
-    formData.append("name", document.getElementById("name").value);
-    formData.append("store", document.getElementById("store").value);
-    formData.append("reason", document.getElementById("reason").value);
-    formData.append("description", document.getElementById("description").value);
+    const filesInput = document.getElementById('photos').files;
+    const filesArray = [];
 
-    const files = document.getElementById("photos").files;
-    for (let i = 0; i < files.length; i++) {
-        formData.append("files", files[i]);
+    for (let i = 0; i < filesInput.length; i++) {
+        const file = filesInput[i];
+        const base64 = await fileToBase64(file);
+        filesArray.push({
+            filename: file.name,
+            contentBase64: base64
+        });
     }
+
+    const payload = {
+        name: document.getElementById("name").value,
+        store: document.getElementById("store").value,
+        reason: document.getElementById("reason").value,
+        description: document.getElementById("description").value,
+        files: filesArray
+    };
 
     try {
         const res = await fetch("https://default07701cb9af5347039146bbc568caf4.a9.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/27bc1969e5074e17b6aa8ccef4bc91b8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=v6A6fj7mCzQ94O3fUhjzR96YgEEGE3lUM3mV08-mQ4U", {
             method: "POST",
-            body: formData
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
         });
 
-        status.innerText = res.ok 
-            ? "✔️ Envoyé avec succès !" 
-            : "❌ Erreur d’envoi.";
-    } catch (error) {
+        status.innerText = res.ok ? "✔️ Envoyé avec succès !" : "❌ Erreur d’envoi.";
+    } catch (e) {
         status.innerText = "❌ Impossible d'envoyer.";
     }
 }
@@ -170,3 +167,4 @@ async function sendData() {
 
 </body>
 </html>
+``
