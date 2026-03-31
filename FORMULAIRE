@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Envoi d'information terrain</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body { font-family: Arial; background: #f2f2f2; padding: 20px; }
+    .card {
+        background: #fff; padding: 20px; border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 500px; margin:auto;
+    }
+    input, textarea, button {
+        width: 100%; padding: 12px; margin-top: 10px; font-size: 16px;
+        border-radius: 6px; border: 1px solid #ccc;
+    }
+    button { background: #005eff; color: white; border: none; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Envoi terrain</h2>
+
+    <label>Nom du livreur</label>
+    <input id="name" type="text">
+
+    <label>Description</label>
+    <textarea id="description" rows="4"></textarea>
+
+    <label>Photos</label>
+    <input id="photos" type="file" multiple accept="image/*" capture="environment">
+
+    <button onclick="sendData()">Envoyer</button>
+    <p id="status"></p>
+</div>
+
+<script>
+async function sendData() {
+    let status = document.getElementById("status");
+    status.innerText = "Envoi en cours...";
+
+    const formData = new FormData();
+    formData.append("name", document.getElementById("name").value);
+    formData.append("description", document.getElementById("description").value);
+
+    const files = document.getElementById("photos").files;
+    for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+    }
+
+    try {
+        const res = await fetch("YOUR_POWER_AUTOMATE_URL", {
+            method: "POST",
+            body: formData
+        });
+        status.innerText = res.ok ? "✔️ Envoyé !" : "❌ Erreur d’envoi.";
+    } catch {
+        status.innerText = "❌ Impossible d'envoyer.";
+    }
+}
+</script>
+
+</body>
+</html>
